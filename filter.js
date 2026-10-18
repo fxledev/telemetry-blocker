@@ -19,8 +19,8 @@ const DOMAIN_TYPE = {
 
 const LINE = /^\|\|([a-z0-9][a-z0-9.-]*\.[a-z]{2,})\^(\$[^,]+(,[^,]+)*)?\s*$/i;
 
-// uBO syntax to DNR. Any line with an option we do not know gets dropped, so a
-// rule we cannot translate exactly is a rule we do not block.
+// Las opciones que no conocemos ($domain=, $redirect=, $removeparam=) hacen
+// que la linea se descarte en vez de bloquear a medias.
 export function parse(text, alreadyBlocked = new Set()) {
   const seen = new Set();
   const rules = [];

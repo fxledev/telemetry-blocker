@@ -1,8 +1,8 @@
 # telemetry blocker
 
-Bloquea las analytics, los crash reporters, el session replay y los píxeles de ads que te siguen a todos lados. Nada más: la navegación, los CDN, las fuentes, las APIs y los pagos pasan.
+Extensión de Chrome que bloquea requests de telemetría: analytics, crash reporters, session replay y píxeles de ads. La navegación y las APIs pasan.
 
-Es MV3 con `declarativeNetRequest`. Las reglas de `rules.json` son estáticas y las de las listas se cargan como dinámicas desde un service worker. No hay contenido scripts ni trackers: la extensión solo intercepta requests.
+MV3 con `declarativeNetRequest`. Sin build ni dependencias. La extensión no lee las requests, las bloquea.
 
 ## instalar
 
@@ -10,38 +10,15 @@ Es MV3 con `declarativeNetRequest`. Las reglas de `rules.json` son estáticas y 
 2. Activá el modo desarrollador
 3. Cargar descomprimida y elegí esta carpeta
 
-Después de un rato mirá la pestaña Network en DevTools: los requests bloqueados aparecen con el status `blocked`.
+Para ver qué se bloqueó, DevTools → Network. Los requests bloqueados salen con status `blocked`.
 
-## el popup
+## reglas
 
-El ícono de la barra abre un panel con:
+`rules.json` trae 90 hosts a mano. El popup deja agregar los tuyos, que se bloquean antes que los de las listas.
 
-- el switch, que apaga todo el bloqueo sin desinstalar nada, y cuántas reglas están activas
-- de dónde salen las listas y cuándo se descargaron por última vez, con un botón para forzar la descarga
-- un campo para agregar un dominio a mano. Acepta `tracker.com`, `https://tracker.com/x` o `tracker.com/path` y guarda solo el host
+Cada seis horas el service worker baja `filters/privacy.txt` de uBlock Origin y `easyprivacy.txt` de EasyList, convierte las líneas `||host^` a reglas dinámicas y saca las viejas. Las líneas con opciones que no sabemos traducir, como `$domain=` o `$redirect`, se descartan: van atadas a un sitio o reescriben la URL.
 
-Cada dominio que agregás se convierte en una regla dinámica con prioridad más alta que las de las listas, así que gana sobre la suscripción. El id de esa regla sale de un hash del host, no de su posición, para que borrar uno del medio no mueva los demás.
-
-## qué bloquea
-
-- analytics: Google Analytics, Firebase, Mixpanel, Amplitude, Segment, Heap, Clarity, New Relic, Datadog, StatCounter, Histats, Yandex Metrica, CNZZ, WebEngage
-- crash reporters: Sentry, Bugsnag, TrackJS, Raygun, Rollbar, Loggly
-- session replay: Hotjar, FullStory, LogRocket, Mouseflow, Inspectlet, Crazy Egg, Quantcast
-- píxeles y redes de ads: DoubleClick, Bing Ads, Criteo, Taboola, Rubicon, Pubmatic, Moat y unas 60 más
-- telemetría de Google y Microsoft desde la web: Bing UET, los beacons de Microsoft 365 y Edge, el Insight Tag de LinkedIn
-
-90 reglas en `rules.json`.
-
-## las listas de siempre
-
-`background.js` baja dos listas cada seis horas y las convierte a reglas dinámicas, así que la cobertura se actualiza sola:
-
-- `filters/privacy.txt` de uBlock Origin, unos 150 hosts curados
-- `easyprivacy.txt` de EasyList
-
-Solo se toman las líneas `||host^` sin opciones raras. Cualquier cosa con `$domain=`, `$removeparam` o `$redirect` se descarta, porque son reglas atadas a un sitio o modifican la URL, y una regla que no se traduce exacta es una regla que no bloqueamos.
-
-El límite de Chrome es 30.000 reglas dinámicas y EasyPrivacy da 47.000 hosts. Se cargan 28.000 y el resto se descarta, por eso la lista de uBlock va primera: los hosts curados nunca son los que se pierden. El service worker lo deja en la consola:
+Chrome permite 30.000 reglas dinámicas y EasyPrivacy da 43.000 hosts, así que entran 28.000 y el resto se descarta. Por eso la lista de uBlock se convierte primero: son 150 hosts curados y no son los que pierden. Queda en la consola del service worker:
 
 ```
 telemetria: 28000 reglas, 19206 descartadas por el limite
@@ -49,35 +26,23 @@ telemetria: 28000 reglas, 19206 descartadas por el limite
 
 ## qué no bloquea
 
-Google Tag Manager, el píxel de Facebook, Intercom y los banners de cookies. Esos rompen login, checkout o el consentimiento en algunos sitios, y un bloqueador que rompe páginas termina desinstalado.
+Google Tag Manager, el píxel de Facebook, Intercom y los banners de cookies. Se usan en login, checkout y consentimiento, y ahí bloquear rompe la página.
 
-## la telemetría de chrome mismo
+La telemetría interna de Chrome no pasa por `declarativeNetRequest`, así que va por DNS. `hosts.example` tiene los hosts que no rompen nada y los que sí, comentados. Con Secure DNS prendido Chrome ignora el hosts, así que hay que apagarlo en `chrome://settings/security`.
 
-Una extensión no la toca. Chrome no pasa sus requests internos por `declarativeNetRequest`, así que el crash reporter y los pings de diagnóstico van aparte, por DNS.
+## editar
 
-`hosts.example` tiene los hosts que no rompen nada y los que sí, comentados. Copialo a `C:\Windows\System32\drivers\etc\hosts` como admin y apagá Secure DNS en `chrome://settings/security`, porque con DoH activo Chrome ignora el hosts.
-
-## configurar
-
-Editá `rules.json`, agregá la regla y tocá recargar en la tarjeta de la extensión. No hay build.
-
-```json
-{ "id": 67, "priority": 1, "action": { "type": "block" }, "condition": { "urlFilter": "||ejemplo.com", "resourceTypes": ["script", "xmlhttprequest", "image", "ping", "other"] } }
-```
-
-`resourceTypes` nunca puede incluir `main_frame` ni `sub_frame`, porque eso rompe la navegación. `check.js` lo rechaza:
+Editá `rules.json` y recargá la extensión. Los ids tienen que ser únicos y ningún `resourceTypes` puede ser `main_frame` ni `sub_frame`.
 
 ```
 node check.js
 node check.js easyprivacy.txt
 ```
 
-## bugs
-
-Abrí un issue con el sitio y qué se rompió.
-
 ## licencia
 
-MIT. Forkeala, cambiala y vendela si querés.
+MIT.
 
-Los íconos no vienen de internet: `tools/icons.js` los dibuja con zlib y los escribe como PNG, porque Chrome no acepta SVG en los íconos de extensión. Corré `node tools/icons.js` si los cambiás.
+Los íconos los dibuja `tools/icons.js` y se regeneran con `node tools/icons.js`.
+
+Si algo se rompe, abrí un issue con el sitio.

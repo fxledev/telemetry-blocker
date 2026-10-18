@@ -1,7 +1,7 @@
 import { parse } from './filter.js';
 
-// La lista de uBlock va primera: son 150 hosts curados y nunca son los que se
-// recortan por el limite.
+// La lista de uBlock va primera porque es la que el limite descarta: 150 hosts
+// curados contra los 43.000 de EasyPrivacy.
 const LISTS = [
   'https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt',
   'https://easylist.to/easylist/easyprivacy.txt',
@@ -12,8 +12,8 @@ const FIRST_ID = 1000;
 const CAP = 28000;
 const BATCH = 5000;
 
-// id estable derivado del host: si fuera la posicion en la lista, borrar una del
-// medio cambiaba el id de todas las siguientes y quedaban huerfanas.
+// Con el id por posicion, borrar una del medio movia el de todas las de abajo y
+// quedaban huerfanas en el perfil.
 function customId(host) {
   let hash = 0;
   for (const char of host) hash = (hash * 31 + char.charCodeAt(0)) % 1_500_000_000;

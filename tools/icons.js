@@ -1,5 +1,5 @@
-// Los iconos de extension tienen que ser PNG y no hay forma de rasterizar SVG
-// sin dependencias, asi que se dibujan aqui: zlib y nada mas.
+// Chrome rechaza SVG en los iconos de extension y rasterizarlo pide una
+// dependencia, asi que el PNG se dibuja aca con zlib.
 //   node tools/icons.js
 
 import { deflateSync } from 'node:zlib';
@@ -51,8 +51,7 @@ function png(size, pixels) {
   ]);
 }
 
-// prohibition sign: rounded square, ring, slash. Supersampled because a 16px
-// ring sin antialias es un manchon.
+// anillo y raya, supersample x4 porque a 16px sin antialias queda un manchon
 function draw(size) {
   const big = size * SS;
   const acc = new Float64Array(size * size * 4);

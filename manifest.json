@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Telemetry Blocker",
   "version": "0.1.0",
-  "description": "Blocks analytics, crash reporters and ad pixels. Nothing else.",
+  "description": "Blocks analytics, crash reporters, session replay and ad pixels.",
   "action": {
     "default_title": "Telemetry Blocker",
     "default_popup": "popup.html",

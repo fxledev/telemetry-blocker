@@ -13,7 +13,7 @@
 0.0.0.0 vortex.data.microsoft.com
 0.0.0.0 incoming.telemetry.mozilla.org
 
-# Opcionales. Cada una corta algo que Chrome usa de verdad:
+# Opcionales, con lo que se rompe al bloquearlas:
 # optimizationguide-pa.googleapis.com  modelos de predicción de navegación
 # safebrowsing.googleapis.com         actualizaciones de Safe Browsing
 # storeedgefd.dsx.mp.microsoft.com    ping de uso de Edge
