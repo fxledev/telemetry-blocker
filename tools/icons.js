@@ -1,7 +1,3 @@
-// Chrome rechaza SVG en los iconos de extension y rasterizarlo pide una
-// dependencia, asi que el PNG se dibuja aca con zlib.
-//   node tools/icons.js
-
 import { deflateSync } from 'node:zlib';
 import { writeFileSync } from 'node:fs';
 
