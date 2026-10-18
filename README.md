@@ -18,7 +18,7 @@ To see what got blocked, open DevTools → Network. Blocked requests show up wit
 
 Every six hours the service worker fetches uBlock Origin's `filters/privacy.txt` and EasyList's `easyprivacy.txt`, converts the `||host^` lines to dynamic rules and drops the old ones. Lines carrying options we can't translate, like `$domain=` or `$redirect=`, get skipped: they are scoped to one site or they rewrite the URL.
 
-Chrome allows 30,000 dynamic rules and EasyPrivacy gives 43,000 hosts, so 28,000 load and the rest is dropped. That's why uBlock's list is converted first: 150 curated hosts, and those aren't the ones that get cut. The service worker logs it:
+Chrome allows 30,000 dynamic rules and EasyPrivacy gives 43,000 hosts, so 28,000 load and the rest is dropped. That's why uBlock's list goes first: those 150 hosts are curated, and they're not the ones that get cut. The service worker logs it:
 
 ```
 telemetria: 28000 reglas, 19206 descartadas por el limite
@@ -26,7 +26,7 @@ telemetria: 28000 reglas, 19206 descartadas por el limite
 
 ## what it doesn't block
 
-Google Tag Manager, the Facebook pixel, Intercom and cookie banners. Sites use them for login, checkout and consent, and blocking those breaks the page.
+Google Tag Manager, the Facebook pixel, Intercom and cookie banners. Sites use them for login, checkout and consent. Blocking those breaks the page.
 
 Chrome's own telemetry never goes through `declarativeNetRequest`, so it has to go out through DNS instead. `hosts.example` lists the hosts that break nothing, plus the ones that do, commented out. With Secure DNS on, Chrome ignores the hosts file, so turn that off in `chrome://settings/security`.
 
@@ -44,6 +44,15 @@ To package for the Chrome Web Store:
 ```
 Compress-Archive -Path manifest.json,background.js,filter.js,rules.json,popup.html,popup.css,popup.js,icon16.png,icon32.png,icon48.png,icon128.png -DestinationPath telemetry-blocker-0.1.0.zip
 ```
+
+## credits
+
+The filter lists are not ours, and they are not in this repo:
+
+- [uBlock Origin's `filters/privacy.txt`](https://github.com/uBlockOrigin/uAssets/blob/master/filters/privacy.txt), from [uAssets](https://github.com/uBlockOrigin/uAssets), GPL-3.0
+- [`easyprivacy.txt`](https://github.com/easylist/easylist), from EasyList, dual licensed GPL-3.0 or CC BY-SA 3.0
+
+Both are fetched at runtime and converted into rules, never redistributed, so the MIT licence on this repo stands. If either one ever gets committed here, that file is GPL and the repo licence has to change with it.
 
 ## license
 
