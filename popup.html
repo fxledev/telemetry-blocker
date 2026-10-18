@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Telemetry Blocker</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Telemetry Blocker</h1>
+        <p id="state" class="sub">Cargando</p>
+      </div>
+      <button id="toggle" class="switch" role="switch" aria-checked="true" aria-label="Bloquear telemetría">
+        <span></span>
+      </button>
+    </header>
+
+    <section>
+      <h2>Listas</h2>
+      <div class="row">
+        <span class="key">Origen</span>
+        <span class="val">uBlock, EasyList</span>
+      </div>
+      <div class="row">
+        <span class="key">Actualizadas</span>
+        <span class="val">
+          <span id="updated">nunca</span>
+          <button id="refresh" type="button">Actualizar</button>
+        </span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tus dominios</h2>
+      <form id="add" novalidate>
+        <input
+          id="host"
+          type="text"
+          placeholder="tracker.example.com"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Dominio a bloquear"
+        />
+        <button type="submit">Añadir</button>
+      </form>
+      <p id="error" role="alert" hidden></p>
+      <ul id="customList"></ul>
+    </section>
+
+    <footer>
+      <span id="counts" class="mono"></span>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

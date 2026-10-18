@@ -1,0 +1,25 @@
+# Telemetría interna de Chrome y Edge.
+#
+# Una extensión no la alcanza: el navegador no pasa esos requests por
+# declarativeNetRequest. Van por DNS, así que esto va en el hosts.
+#
+# Antes: apagá Secure DNS en chrome://settings/security. Con DoH activo Chrome
+# resuelve por su cuenta y el hosts se ignora.
+#
+# Aplicar como admin, al final de C:\Windows\System32\drivers\etc\hosts:
+#   notepad C:\Windows\System32\drivers\etc\hosts
+
+0.0.0.0 clients4.google.com
+0.0.0.0 vortex.data.microsoft.com
+0.0.0.0 incoming.telemetry.mozilla.org
+
+# Opcionales. Cada una corta algo que Chrome usa de verdad:
+# optimizationguide-pa.googleapis.com  modelos de predicción de navegación
+# safebrowsing.googleapis.com         actualizaciones de Safe Browsing
+# storeedgefd.dsx.mp.microsoft.com    ping de uso de Edge
+# play.googleapis.com                 servicios de Play en escritorio
+#
+# 0.0.0.0 optimizationguide-pa.googleapis.com
+# 0.0.0.0 safebrowsing.googleapis.com
+# 0.0.0.0 storeedgefd.dsx.mp.microsoft.com
+# 0.0.0.0 play.googleapis.com
